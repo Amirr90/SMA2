@@ -1,14 +1,13 @@
 package com.example.sma.TeacherFragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.dinuscxj.refresh.RecyclerRefreshLayout;
 import com.example.sma.Adapter.ProfileAdapter;
@@ -46,12 +45,11 @@ public class TeacherTransportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_teacher_transport, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.fragment_transport_parent_rec);
+        recyclerView = view.findViewById(R.id.fragment_transport_parent_rec);
 
-        swipe_refresh = (RecyclerRefreshLayout) view.findViewById(R.id.fragment_transport_refresh_layout);
+        swipe_refresh = view.findViewById(R.id.fragment_transport_refresh_layout);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         profileAdapter = new ProfileAdapter(profileData, getActivity());
@@ -59,13 +57,8 @@ public class TeacherTransportFragment extends Fragment {
         loadData();
 
 
-        swipe_refresh.setOnRefreshListener(new RecyclerRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                //setData();
-                loadData();
-            }
-        });
+        //setData();
+        swipe_refresh.setOnRefreshListener(this::loadData);
 
         return view;
     }

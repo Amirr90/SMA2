@@ -46,7 +46,7 @@ public class StudentProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_profile);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.StudentProfile_profile_toolbar);
+        Toolbar toolbar = findViewById(R.id.StudentProfile_profile_toolbar);
         setToolbar(toolbar, "Student Profile");
 
         StudentId = getIntent().getStringExtra(STU_ID);
@@ -59,24 +59,18 @@ public class StudentProfile extends AppCompatActivity {
         showAlertDialog(StudentProfile.this);
         firestore.collection(STUDENT_QUERY).document(StudentId)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot snapshot) {
-                        hideAlertDialog();
-                        if (snapshot.exists()) {
-                            setProfileInfo(snapshot);
-                            setFragments(snapshot);
-                        } else {
-                            Toast.makeText(StudentProfile.this, "Student not found", Toast.LENGTH_SHORT).show();
-                        }
+                .addOnSuccessListener(snapshot -> {
+                    hideAlertDialog();
+                    if (snapshot.exists()) {
+                        setProfileInfo(snapshot);
+                        setFragments(snapshot);
+                    } else {
+                        Toast.makeText(StudentProfile.this, "Student not found", Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideAlertDialog();
-                Toast.makeText(StudentProfile.this, getString(R.string.failed_to_get), Toast.LENGTH_SHORT).show();
-            }
-        });
+                }).addOnFailureListener(e -> {
+                    hideAlertDialog();
+                    Toast.makeText(StudentProfile.this, getString(R.string.failed_to_get), Toast.LENGTH_SHORT).show();
+                });
 
     }
 
@@ -118,14 +112,14 @@ public class StudentProfile extends AppCompatActivity {
 
     private void setFragments(DocumentSnapshot snapshot) {
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.StudentProfile_item_tabs);
+        TabLayout tabLayout = findViewById(R.id.StudentProfile_item_tabs);
         tabLayout.addTab(tabLayout.newTab().setText(PERSONAL));
         tabLayout.addTab(tabLayout.newTab().setText(PARENTS));
         tabLayout.addTab(tabLayout.newTab().setText(TRANSPORT));
         tabLayout.addTab(tabLayout.newTab().setText(OTHERS));
         tabLayout.addTab(tabLayout.newTab().setText(ATTENDANCE));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.StudentProfile_pager);
+        final ViewPager viewPager = findViewById(R.id.StudentProfile_pager);
         final PagerAdapter adapter = new PagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount(), StudentId, snapshot);
         viewPager.setAdapter(adapter);

@@ -20,9 +20,6 @@ public class Student {
     }
 
 
-
-
-
     public String getSon_of() {
         if (son_of == null)
             return "";
@@ -49,6 +46,13 @@ public class Student {
         this.name = name;
         this.isChecked = isChecked;
         this.image = image;
+    }
+
+    public Student(String name, boolean isChecked, String image, long roll_no) {
+        this.name = name;
+        this.isChecked = isChecked;
+        this.image = image;
+        this.roll_no = roll_no;
     }
 
     public Long getRoll_no() {

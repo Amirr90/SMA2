@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.example.sma.Student.fragments.AttendanceFragment;
 import com.example.sma.TeacherFragments.TeacherOtherFragment;
 import com.example.sma.TeacherFragments.TeacherParentFragment;
 import com.example.sma.TeacherFragments.TeacherPersonalFragment;
@@ -32,8 +33,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
             case 2:
                 return new TeacherTransportFragment(snapshot);
             case 3:
-            case 4:
                 return new TeacherOtherFragment(snapshot);
+            case 4:
+                return new AttendanceFragment(snapshot);
+
             default:
                 return null;
         }

@@ -79,6 +79,8 @@
         android:elevation="5dp">
 
         <com.google.android.material.tabs.TabLayout
+            app:tabIndicatorGravity="stretch"
+            app:tabMode="scrollable"
             android:id="@+id/StudentProfile_item_tabs"
             style="@style/MyCustomTabLayout"
             android:layout_width="match_parent"

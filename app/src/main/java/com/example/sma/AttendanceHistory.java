@@ -1,6 +1,5 @@
 package com.example.sma;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -23,11 +22,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sma.model.Attendance;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -36,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
@@ -47,6 +44,7 @@ import static com.example.sma.Util.Utils.IMAGE;
 import static com.example.sma.Util.Utils.MONTH;
 import static com.example.sma.Util.Utils.NAME;
 import static com.example.sma.Util.Utils.PRESENT;
+import static com.example.sma.Util.Utils.ROLL_NUMBER;
 import static com.example.sma.Util.Utils.hideAlertDialog;
 
 public class AttendanceHistory extends AppCompatActivity {
@@ -67,14 +65,14 @@ public class AttendanceHistory extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance_history);
-        Toolbar toolbar = (Toolbar) findViewById(R.id._at_hi_toolbar);
+        Toolbar toolbar = findViewById(R.id._at_hi_toolbar);
         setToolbar(toolbar, "Select Date");
 
-        RecLay = (RelativeLayout) findViewById(R.id.rec_lay);
-        noAttendanceLayout = (ConstraintLayout) findViewById(R.id.noAttendanceLay);
+        RecLay = findViewById(R.id.rec_lay);
+        noAttendanceLayout = findViewById(R.id.noAttendanceLay);
 
 
-        recyclerView = (RecyclerView) findViewById(R.id.a_h_rec);
+        recyclerView = findViewById(R.id.a_h_rec);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         adapter = new AttendanceHistoryAdapter(attendanceList, this);
         recyclerView.setAdapter(adapter);
@@ -134,62 +132,56 @@ public class AttendanceHistory extends AppCompatActivity {
                 .whereEqualTo(MONTH, mMonth)
                 .whereEqualTo(DAY, mDay)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @SuppressLint("DefaultLocale")
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        hideAlertDialog();
-                        if (queryDocumentSnapshots.getDocuments().size() == 0) {
-                            Toast.makeText(AttendanceHistory.this, "No Data Found", Toast.LENGTH_SHORT).show();
-                            getSupportActionBar().setTitle("Select Date");
-                            attendanceList.clear();
-                            adapter.notifyDataSetChanged();
-
-                            noAttendanceLayout.setVisibility(View.VISIBLE);
-                            RecLay.setVisibility(View.GONE);
-                            return;
-                        }
-
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    hideAlertDialog();
+                    if (queryDocumentSnapshots.getDocuments().size() == 0) {
+                        Toast.makeText(AttendanceHistory.this, "No Data Found", Toast.LENGTH_SHORT).show();
+                        Objects.requireNonNull(getSupportActionBar()).setTitle("Select Date");
                         attendanceList.clear();
-                        DocumentSnapshot snapshot = queryDocumentSnapshots.getDocuments().get(0);
-                        List<Map<String, Object>> mapList = (List<Map<String, Object>>) snapshot.get(ATTENDANCE);
-                        for (int a = 0; a < mapList.size(); a++) {
-                            String name = mapList.get(a).get(NAME).toString();
-                            Boolean status = (Boolean) mapList.get(a).get(PRESENT);
-                            String image = (String) mapList.get(a).get(IMAGE);
-                            attendanceList.add(new Attendance(name, status, image));
-                            if (status != null) {
-                                if (status)
-                                    present++;
-                                else
-                                    absent++;
-                            }
-
-                        }
-
-                        TextView mPresent = (TextView) findViewById(R.id.present_tv);
-                        TextView mAbsent = (TextView) findViewById(R.id.absent_tv);
-                        TextView mTotal = (TextView) findViewById(R.id.total_tv);
-
-                        mPresent.setText(String.format("%d Presents", present));
-                        mAbsent.setText(String.format("%d Absent", absent));
-                        mTotal.setText(String.format("%d Total", attendanceList.size()));
-
-                        RecLay.setVisibility(View.VISIBLE);
-                        noAttendanceLayout.setVisibility(View.GONE);
-
-                        getSupportActionBar().setTitle("Date: " + date);
                         adapter.notifyDataSetChanged();
 
+                        noAttendanceLayout.setVisibility(View.VISIBLE);
+                        RecLay.setVisibility(View.GONE);
+                        return;
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(AttendanceHistory.this, "No data found,try again", Toast.LENGTH_SHORT).show();
-                RecLay.setVisibility(View.GONE);
-                getSupportActionBar().setTitle("Select Date");
-            }
-        });
+
+                    attendanceList.clear();
+                    DocumentSnapshot snapshot = queryDocumentSnapshots.getDocuments().get(0);
+                    List<Map<String, Object>> mapList = (List<Map<String, Object>>) snapshot.get(ATTENDANCE);
+                    for (int a = 0; a < mapList.size(); a++) {
+                        String name = mapList.get(a).get(NAME).toString();
+                        Boolean status = (Boolean) mapList.get(a).get(PRESENT);
+                        String image = (String) mapList.get(a).get(IMAGE);
+                        Long rollNumber = (Long) mapList.get(a).get(ROLL_NUMBER);
+                        attendanceList.add(new Attendance(name, status, image, String.valueOf(rollNumber)));
+                        if (status != null) {
+                            if (status)
+                                present++;
+                            else
+                                absent++;
+                        }
+
+                    }
+
+                    TextView mPresent = findViewById(R.id.present_tv);
+                    TextView mAbsent = findViewById(R.id.absent_tv);
+                    TextView mTotal = findViewById(R.id.total_tv);
+
+                    mPresent.setText(String.format("%d Presents", present));
+                    mAbsent.setText(String.format("%d Absent", absent));
+                    mTotal.setText(String.format("%d Total", attendanceList.size()));
+
+                    RecLay.setVisibility(View.VISIBLE);
+                    noAttendanceLayout.setVisibility(View.GONE);
+
+                    Objects.requireNonNull(getSupportActionBar()).setTitle("Date: " + date);
+                    adapter.notifyDataSetChanged();
+
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(AttendanceHistory.this, "No data found,try again", Toast.LENGTH_SHORT).show();
+                    RecLay.setVisibility(View.GONE);
+                    Objects.requireNonNull(getSupportActionBar()).setTitle("Select Date");
+                });
     }
 
     @Override
@@ -200,7 +192,7 @@ public class AttendanceHistory extends AppCompatActivity {
 
     private void setToolbar(Toolbar toolbar, String id) {
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(id);
     }
@@ -253,21 +245,16 @@ public class AttendanceHistory extends AppCompatActivity {
                         });
 
 
-            holder.layout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showProfileDialog(list.get(position));
-                }
-            });
+            holder.layout.setOnClickListener(v -> showProfileDialog(list.get(position)));
         }
 
         private void showProfileDialog(Attendance attendance) {
-            TextView mStuName = (TextView) dialog.findViewById(R.id.s_name);
-            TextView mStuRollNumber = (TextView) dialog.findViewById(R.id.s_roll_number);
-            TextView mStuFatherName = (TextView) dialog.findViewById(R.id.s_father_name);
-            final CircleImageView mStuProfile = (CircleImageView) dialog.findViewById(R.id.s_profile);
-            final Button mViewProfile = (Button) dialog.findViewById(R.id.view_stdent_profile_btn);
-            Button dismissBtn = (Button) dialog.findViewById(R.id.dismiss_btn);
+            TextView mStuName = dialog.findViewById(R.id.s_name);
+            TextView mStuRollNumber = dialog.findViewById(R.id.s_roll_number);
+            TextView mStuFatherName = dialog.findViewById(R.id.s_father_name);
+            final CircleImageView mStuProfile = dialog.findViewById(R.id.s_profile);
+            final Button mViewProfile = dialog.findViewById(R.id.view_stdent_profile_btn);
+            Button dismissBtn = dialog.findViewById(R.id.dismiss_btn);
 
             mStuFatherName.setVisibility(View.GONE);
             mStuName.setText(attendance.getName());
@@ -289,21 +276,13 @@ public class AttendanceHistory extends AppCompatActivity {
                 mStuProfile.setImageResource(R.drawable.profile);
 
 
-            mViewProfile.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                    /*startActivity(new Intent(AttendanceHistory.this, StudentProfile.class)
-                            .putExtra(STU_ID, snapshot.getId()));*/
-                }
+            mViewProfile.setOnClickListener(v -> {
+                dialog.dismiss();
+                /*startActivity(new Intent(AttendanceHistory.this, StudentProfile.class)
+                        .putExtra(STU_ID, snapshot.getId()));*/
             });
 
-            mViewProfile.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
-            });
+            mViewProfile.setOnClickListener(v -> dialog.dismiss());
             dialog.show();
         }
 
@@ -320,9 +299,9 @@ public class AttendanceHistory extends AppCompatActivity {
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
-            layout = (RelativeLayout) itemView.findViewById(R.id.card_Home);
-            textView = (TextView) itemView.findViewById(R.id.textView3);
-            imageView = (CircleImageView) itemView.findViewById(R.id.home_rec_imageView3);
+            layout = itemView.findViewById(R.id.card_Home);
+            textView = itemView.findViewById(R.id.textView3);
+            imageView = itemView.findViewById(R.id.home_rec_imageView3);
         }
     }
 }

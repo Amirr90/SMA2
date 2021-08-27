@@ -1,7 +1,6 @@
 package com.example.sma;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,11 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sma.model.Attendance;
 import com.example.sma.model.Student;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +37,9 @@ import static com.example.sma.Util.Utils.DAY;
 import static com.example.sma.Util.Utils.IMAGE;
 import static com.example.sma.Util.Utils.MONTH;
 import static com.example.sma.Util.Utils.NAME;
+import static com.example.sma.Util.Utils.ROLL_NUMBER;
 import static com.example.sma.Util.Utils.STUDENT_QUERY;
+import static com.example.sma.Util.Utils.TEACHER_ID;
 import static com.example.sma.Util.Utils.TEACHER_NAME;
 import static com.example.sma.Util.Utils.TIMESTAMP;
 import static com.example.sma.Util.Utils.YEAR;
@@ -70,9 +68,9 @@ public class AttendanceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_attendance2);
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        titleTv = (TextView) toolbar.findViewById(R.id.title_bar);
-        next = (ImageView) toolbar.findViewById(R.id.next_icon);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        titleTv = toolbar.findViewById(R.id.title_bar);
+        next = toolbar.findViewById(R.id.next_icon);
 
 
         if (getIntent().hasExtra(CLASS)) {
@@ -87,7 +85,7 @@ public class AttendanceActivity extends AppCompatActivity {
         Day = calendar.get(Calendar.DAY_OF_MONTH);
 
         setToolbar(toolbar, "Select Student");
-        rvParent = (RecyclerView) findViewById(R.id.all_student_for_attendance_rec);
+        rvParent = findViewById(R.id.all_student_for_attendance_rec);
         rvParent.setLayoutManager(new LinearLayoutManager(this));
         rvParent.setHasFixedSize(true);
         studentAdapter = new StudentAdapter(studentList, this);
@@ -131,38 +129,26 @@ public class AttendanceActivity extends AppCompatActivity {
                 .whereEqualTo(MONTH, Month)
                 .whereEqualTo(DAY, Day)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                        if (queryDocumentSnapshots.getDocuments().size() == 0) {
-                            showStudents();
+                    if (queryDocumentSnapshots.getDocuments().size() == 0) {
+                        showStudents();
 
-                        } else {
-                            new AlertDialog.Builder(AttendanceActivity.this)
-                                    .setMessage("Today's Attendance is completed")
-                                    .setPositiveButton("Go back", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                            onBackPressed();
-                                        }
-                                    }).setNegativeButton("No,continue", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                    } else {
+                        new AlertDialog.Builder(AttendanceActivity.this)
+                                .setMessage("Today's Attendance is completed")
+                                .setPositiveButton("Go back", (dialog, which) -> {
                                     dialog.dismiss();
-                                    showStudents();
-                                }
-                            }).setCancelable(false)
-                                    .show();
-                        }
+                                    onBackPressed();
+                                }).setNegativeButton("No,continue", (dialog, which) -> {
+                            dialog.dismiss();
+                            showStudents();
+                        }).setCancelable(false)
+                                .show();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideAlertDialog();
-                onBackPressed();
-            }
+                }).addOnFailureListener(e -> {
+            hideAlertDialog();
+            onBackPressed();
         });
 
 
@@ -172,30 +158,23 @@ public class AttendanceActivity extends AppCompatActivity {
         final String cla = Class;
         final String year = String.valueOf(Year);
         firestore.collection(STUDENT_QUERY)
-               // .whereEqualTo(YEAR, year + "")
+                // .whereEqualTo(YEAR, year + "")
                 .whereEqualTo(_CLASS, cla)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        hideAlertDialog();
-                        if (queryDocumentSnapshots.isEmpty()) {
-                            Toast.makeText(AttendanceActivity.this, "Data is empty", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        for (DocumentSnapshot snapshot : queryDocumentSnapshots) {
-                            String name = snapshot.getString(NAME);
-                            String image = snapshot.getString(IMAGE);
-                            studentList.add(new Student(name, false, image));
-                        }
-                        studentAdapter.notifyDataSetChanged();
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    hideAlertDialog();
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        Toast.makeText(AttendanceActivity.this, "Data is empty", Toast.LENGTH_SHORT).show();
+                        return;
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(AttendanceActivity.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    for (DocumentSnapshot snapshot : queryDocumentSnapshots) {
+                        String name = snapshot.getString(NAME);
+                        String image = snapshot.getString(IMAGE);
+                        Long rollNumber = snapshot.getLong(ROLL_NUMBER);
+                        studentList.add(new Student(name, false, image, rollNumber));
+                    }
+                    studentAdapter.notifyDataSetChanged();
+                }).addOnFailureListener(e -> Toast.makeText(AttendanceActivity.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
     }
 
 
@@ -230,24 +209,20 @@ public class AttendanceActivity extends AppCompatActivity {
                 holder.checkedTextView.setBackgroundColor(Color.WHITE);
 
 
-            holder.checkedTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String name = studentList.get(position).getName();
-                    String image = studentList.get(position).getImage();
-                    if (studentList.get(position).isPresent()) {
-                        holder.checkedTextView.setChecked(false);
-                        studentList.remove(position);
-                        studentList.add(position, new Student(name, false, image));
-                        updateCheckedCount();
-                    } else {
-                        holder.checkedTextView.setChecked(true);
-                        studentList.remove(position);
-                        studentList.add(position, new Student(name, true, image));
-                        updateCheckedCount();
-                    }
-                    notifyDataSetChanged();
+            holder.checkedTextView.setOnClickListener(v -> {
+                String name = studentList.get(position).getName();
+                String image = studentList.get(position).getImage();
+                if (studentList.get(position).isPresent()) {
+                    holder.checkedTextView.setChecked(false);
+                    studentList.remove(position);
+                    studentList.add(position, new Student(name, false, image));
+                } else {
+                    holder.checkedTextView.setChecked(true);
+                    studentList.remove(position);
+                    studentList.add(position, new Student(name, true, image));
                 }
+                updateCheckedCount();
+                notifyDataSetChanged();
             });
         }
 
@@ -261,7 +236,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
             public MyStudentViewHolder(@NonNull View itemView) {
                 super(itemView);
-                checkedTextView = (CheckedTextView) itemView.findViewById(R.id.checkedTextView);
+                checkedTextView = itemView.findViewById(R.id.checkedTextView);
             }
         }
     }
@@ -275,7 +250,8 @@ public class AttendanceActivity extends AppCompatActivity {
         for (Student student : studentList) {
             attendanceList.add(new Attendance(student.getName(),
                     student.isPresent(),
-                    student.getImage()));
+                    student.getImage(),
+                    String.valueOf(student.getRoll_no())));
             if (!student.isPresent()) {
                 absent++;
                 absentList.add(student);
@@ -287,86 +263,73 @@ public class AttendanceActivity extends AppCompatActivity {
         if (absent == 1)
             title = absent + " Student is absent today";
         else if (absent == 0) {
-            title = "Congratulation!!!\nYou have 0 absent today";
+            title = "Congratulation !!\nYou have full attendance today";
             new AlertDialog.Builder(AttendanceActivity.this)
                     .setTitle(title)
-                    .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(AttendanceActivity.this, "Proceeding.....", Toast.LENGTH_SHORT).show();
-
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).show();
+                    .setPositiveButton("Proceed", (dialog, which) -> Toast.makeText(AttendanceActivity.this, "Proceeding.....", Toast.LENGTH_SHORT).show())
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).show();
             return;
         } else
             title = absent + " Students are absent today";
 
-        CharSequence absentStudentNameList[] = new CharSequence[absentList.size()];
+        CharSequence[] absentStudentNameList = new CharSequence[absentList.size()];
         for (int a = 0; a < absentList.size(); a++) {
             absentStudentNameList[a] = absentList.get(a).getName();
         }
         new AlertDialog.Builder(AttendanceActivity.this)
                 .setTitle(title)
-                .setItems(absentStudentNameList, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                .setItems(absentStudentNameList, (dialog, which) -> {
 
-                    }
                 })
-                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showStudents();
-                        updateAttendance(attendanceList);
-                    }
+                .setPositiveButton("Proceed", (dialog, which) -> {
+                    showStudents();
+                    updateAttendance(attendanceList);
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).show();
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).show();
     }
 
     private void updateAttendance(List<Attendance> attendanceList) {
+        String year = String.valueOf(Year);
+        String cla = "Class " + Class;
         showAlertDialog(this);
         Map<String, Object> map = new HashMap<>();
         map.put(ATTENDANCE, attendanceList);
         map.put(MONTH, Month);
         map.put(YEAR, Year);
         map.put(DAY, Day);
+        map.put(CLASS, cla);
+        map.put(TEACHER_ID, "teacherId");
         map.put(TIMESTAMP, System.currentTimeMillis());
         map.put(TEACHER_NAME, tName);
-        String year = String.valueOf(Year);
-        String cla = "Class " + Class;
+
         firestore.collection(ATTENDANCE)
                 .document(year)
                 .collection(cla)
                 .document(String.valueOf(Day))
                 .set(map)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        hideAlertDialog();
-                        Intent intent = new Intent();
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideAlertDialog();
-                Intent intent = new Intent();
-                setResult(RESULT_CANCELED, intent);
-                finish();
-            }
+                .addOnSuccessListener(aVoid -> {
+                    hideAlertDialog();
+                    Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }).addOnFailureListener(e -> {
+            hideAlertDialog();
+            Intent intent = new Intent();
+            setResult(RESULT_CANCELED, intent);
+            finish();
         });
+
+      /*  firestore.collection(ATTENDANCE).add(map).addOnSuccessListener(documentReference -> {
+            hideAlertDialog();
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
+            finish();
+        }).addOnFailureListener(e -> {
+            hideAlertDialog();
+            Intent intent = new Intent();
+            setResult(RESULT_CANCELED, intent);
+            finish();
+        });*/
 
     }
 
