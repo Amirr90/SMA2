@@ -13,17 +13,6 @@ public class Offline extends Application {
         super.onCreate();
 
 
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build();
-        //db.setFirestoreSettings(settings);
 
-
-        Picasso.Builder builder = new Picasso.Builder(this);
-        builder.downloader(new OkHttpDownloader(this, Integer.MAX_VALUE));
-        Picasso built = builder.build();
-        //built.setIndicatorsEnabled(true);
-        // built.setLoggingEnabled(true);
-        Picasso.setSingletonInstance(built);
     }
 }

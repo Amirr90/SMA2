@@ -2,22 +2,19 @@ package com.example.sma.Util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.example.sma.MainActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.example.sma.R;
-import com.example.sma.ScheduleActivity;
 import com.example.sma.SplashScreen;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -28,7 +25,6 @@ import com.tt.whorlviewlibrary.WhorlView;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -109,6 +105,11 @@ public class Utils {
     public static final String RESULT = "result";
     public static final String PASS = "pass";
     public static final String FAIL = "fail";
+    public static final String ADMISSION = "Admission";
+    public static final String ADD_STUDENT = "Add Student";
+    public static final String ADD_FACULTY = "Add Faculty";
+    public static final String ADD_WORKER = "Add Worker";
+    public static final String ADD_NOTICE = "Add Notice";
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
@@ -370,4 +371,6 @@ public class Utils {
         list.add("Saturday");
         return list;
     }
+
+
 }

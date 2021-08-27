@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/plane_layout"
-        android:background="@color/colorAccent"
         android:layout_width="match_parent"
-        android:layout_height="220dp"/>
-    <RelativeLayout
-        android:paddingTop="20dp"
-        android:id="@+id/info_lay"
+        android:layout_height="220dp"
         android:background="@color/colorAccent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="vertical" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_centerHorizontal="true"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout
+        android:id="@+id/info_lay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:paddingTop="20dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/t_profile_image"
-            android:layout_marginTop="10dp"
             android:layout_width="70dp"
             android:layout_height="70dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
             android:src="@drawable/profile"
-            app:civ_border_width="2dp"
-            app:civ_border_color="@color/colorPrimaryDark"/>
+            app:civ_border_color="@color/colorPrimaryDark"
+            app:civ_border_width="2dp" />
 
         <TextView
             android:id="@+id/t_name"
@@ -67,15 +67,17 @@
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginBottom="25dp"
+        android:id="@+id/rv_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/info_lay"
+        android:layout_marginLeft="25dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="25dp"
-        android:layout_marginLeft="25dp"
-        android:layout_below="@+id/info_lay"
-        android:id="@+id/rv_parent"
-        tools:listitem="@layout/rv_parent_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_marginBottom="25dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="4"
+        tools:listitem="@layout/rv_parent_view" />
 
 
 </RelativeLayout>

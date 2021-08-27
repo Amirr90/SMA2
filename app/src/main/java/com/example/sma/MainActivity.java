@@ -19,10 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sma.Student.FeeActivity;
 import com.example.sma.Util.Utils;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -33,6 +30,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.sma.Util.Utils.ADMISSION;
 import static com.example.sma.Util.Utils.ATTENDANCE;
 import static com.example.sma.Util.Utils.ATTENDANCE_HISTORY;
 import static com.example.sma.Util.Utils.CLASS;
@@ -58,7 +56,7 @@ import static com.example.sma.Util.Utils.showAlertDialog;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TEACHER_ID = "yL7AxmO05uTwSBic2VZz";
+    private static final String TEACHER_ID = "Z0y70DXbMN1sipAULN1V";
     private static final int REQUEST_CODE_ATTENDANCE_COMPLETE = 101;
     RecyclerView rvParent;
     List<String> list = new ArrayList<>();
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        rvParent = (RecyclerView) findViewById(R.id.rv_parent);
+        rvParent = findViewById(R.id.rv_parent);
         rvParent.setLayoutManager(new GridLayoutManager(this, 3));
         rvParent.setHasFixedSize(true);
         parentAdapter = new ParentAdapter(this, list);
@@ -93,52 +91,43 @@ public class MainActivity extends AppCompatActivity {
         firestore.collection(TEACHERS)
                 .document(TEACHER_ID)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        hideAlertDialog();
-                        if (documentSnapshot.exists()) {
+                .addOnSuccessListener(documentSnapshot -> {
+                    hideAlertDialog();
+                    if (documentSnapshot.exists()) {
 
-                            TextView tName = (TextView) findViewById(R.id.t_name);
-                            TextView tClass = (TextView) findViewById(R.id.t_class);
-                            final CircleImageView tProfile = (CircleImageView) findViewById(R.id.t_profile_image);
+                        TextView tName = findViewById(R.id.t_name);
+                        TextView tClass = findViewById(R.id.t_class);
+                        final CircleImageView tProfile = findViewById(R.id.t_profile_image);
 
-                            name = documentSnapshot.getString(NAME);
-                            Class = documentSnapshot.getString(CLASS);
-                            subject = documentSnapshot.getString(SUBJECT);
-                            image = documentSnapshot.getString(IMAGE);
+                        name = documentSnapshot.getString(NAME);
+                        Class = documentSnapshot.getString(CLASS);
+                        subject = documentSnapshot.getString(SUBJECT);
+                        image = documentSnapshot.getString(IMAGE);
 
-                            if (name != null)
-                                tName.setText(name);
-                            if (Class != null)
-                                tClass.setText(CLASS_ + Class);
-                            if (image != null)
-                                Picasso.with(MainActivity.this).load(image)
-                                        .networkPolicy(NetworkPolicy.OFFLINE)
-                                        .placeholder(R.drawable.profile)
-                                        .into(tProfile, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
+                        if (name != null)
+                            tName.setText(name);
+                        if (Class != null)
+                            tClass.setText(CLASS_ + Class);
+                        if (image != null)
+                            Picasso.with(MainActivity.this).load(image)
+                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                                    .placeholder(R.drawable.profile)
+                                    .into(tProfile, new Callback() {
+                                        @Override
+                                        public void onSuccess() {
 
-                                            }
+                                        }
 
-                                            @Override
-                                            public void onError() {
-                                                Picasso.with(MainActivity.this).load(image).placeholder(R.drawable.profile).into(tProfile);
-                                            }
-                                        });
-                        }
+                                        @Override
+                                        public void onError() {
+                                            Picasso.with(MainActivity.this).load(image).placeholder(R.drawable.profile).into(tProfile);
+                                        }
+                                    });
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideAlertDialog();
-            }
-        });
+                }).addOnFailureListener(e -> hideAlertDialog());
     }
 
     private void loadData() {
-
         list.add(ATTENDANCE);
         list.add(EXAMINATION);
         list.add(CLASS_ROUTINE);
@@ -150,9 +139,8 @@ public class MainActivity extends AppCompatActivity {
         list.add(ONLINE_EXAM_TEST);
         list.add(ATTENDANCE_HISTORY);
         list.add(PROFILE);
+        list.add(Utils.ADMISSION);
         list.add(LOG_OUT);
-
-
     }
 
     public class ParentAdapter extends RecyclerView.Adapter<ParentAdapter.MyParentViewHolder> {
@@ -170,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
                 R.drawable.exam,
                 R.drawable.attendance_history,
                 R.drawable.t_profile,
+                R.drawable.noticeboard,
                 R.drawable.t_profile,
+
         };
 
         public ParentAdapter(Context context, List<String> list) {
@@ -190,67 +180,69 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull MyParentViewHolder holder, final int position) {
             holder.textView.setText(list.get(position));
             holder.imageView.setImageResource(iconsList[position]);
-            holder.cardHome.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String selectedText = list.get(position);
-                    switch (selectedText) {
-                        case ATTENDANCE: {
-                            Intent intent = new Intent(context, AttendanceActivity.class);
-                            intent.putExtra(CLASS, Class);
-                            intent.putExtra("TEACHER_NAME", name);
-                            startActivityForResult(intent, REQUEST_CODE_ATTENDANCE_COMPLETE);
-
-                        }
-                        break;
-                        case ATTENDANCE_HISTORY:
-                            context.startActivity(new Intent(context, AttendanceHistory.class)
-                                    .putExtra("CLASS", Class));
-                            break;
-
-
-                        case FEE:
-                            context.startActivity(new Intent(context, FeeActivity.class)
-                                    .putExtra(CLASS, Class));
-                            break;
-                        case EXAMINATION:
-                            context.startActivity(new Intent(context, ExaminationActivity.class)
-                                    .putExtra(Utils.TEACHER_ID, TEACHER_ID));
-                            break;
-                        case STUDENT: {
-                            context.startActivity(new Intent(context, StudentsActivity.class).putExtra("Class", Class));
-
-                        }
-                        break;
-
-                        case CLASS_ROUTINE: {
-                            context.startActivity(new Intent(context, ClassRoutineActivity.class)
-                                    .putExtra("Class", Class)
-                                    .putExtra("Name", name)
-                                    .putExtra(Utils.TEACHER_ID, TEACHER_ID)
-                                    .putExtra(IMAGE, image));
-                        }
-                        break;
-
-
-                        case PROFILE: {
-                            context.startActivity(new Intent(context, ProfileActivity.class)
-                                    .putExtra("Class", Class)
-                                    .putExtra("Name", name)
-                                    .putExtra(Utils.TEACHER_ID, TEACHER_ID)
-                                    .putExtra(IMAGE, image));
-
-                        }
-                        break;
-                        case LOG_OUT: {
-                            logout(false, MainActivity.this);
-
-                        }
-                        break;
-                        default:
-                            Snackbar.make(v, "coming soon", Snackbar.LENGTH_SHORT).show();
+            holder.cardHome.setOnClickListener(v -> {
+                String selectedText = list.get(position);
+                switch (selectedText) {
+                    case ATTENDANCE: {
+                        Intent intent = new Intent(context, AttendanceActivity.class);
+                        intent.putExtra(CLASS, Class);
+                        intent.putExtra("TEACHER_NAME", name);
+                        startActivityForResult(intent, REQUEST_CODE_ATTENDANCE_COMPLETE);
 
                     }
+                    break;
+                    case ATTENDANCE_HISTORY:
+                        context.startActivity(new Intent(context, AttendanceHistory.class)
+                                .putExtra("CLASS", Class));
+                        break;
+
+
+                    case FEE:
+                        context.startActivity(new Intent(context, FeeActivity.class)
+                                .putExtra(CLASS, Class));
+                        break;
+                    case EXAMINATION:
+                        context.startActivity(new Intent(context, ExaminationActivity.class)
+                                .putExtra(Utils.TEACHER_ID, TEACHER_ID));
+                        break;
+                    case STUDENT: {
+                        context.startActivity(new Intent(context, StudentsActivity.class).putExtra("Class", Class));
+
+                    }
+                    break;
+
+                    case CLASS_ROUTINE: {
+                        context.startActivity(new Intent(context, ClassRoutineActivity.class)
+                                .putExtra("Class", Class)
+                                .putExtra("Name", name)
+                                .putExtra(Utils.TEACHER_ID, TEACHER_ID)
+                                .putExtra(IMAGE, image));
+                    }
+                    break;
+
+
+                    case PROFILE: {
+                        context.startActivity(new Intent(context, ProfileActivity.class)
+                                .putExtra("Class", Class)
+                                .putExtra("Name", name)
+                                .putExtra(Utils.TEACHER_ID, TEACHER_ID)
+                                .putExtra(IMAGE, image));
+
+                    }
+                    break;
+                    case LOG_OUT: {
+                        logout(false, MainActivity.this);
+
+                    }
+                    break;
+                    case ADMISSION: {
+                        context.startActivity(new Intent(context, AdmissionActivity.class));
+
+                    }
+                    break;
+                    default:
+                        Snackbar.make(v, "coming soon", Snackbar.LENGTH_SHORT).show();
+
                 }
             });
         }
@@ -274,9 +266,9 @@ public class MainActivity extends AppCompatActivity {
 
             public MyParentViewHolder(@NonNull View itemView) {
                 super(itemView);
-                textView = (TextView) itemView.findViewById(R.id.textView);
-                cardHome = (RelativeLayout) itemView.findViewById(R.id.card_Home);
-                imageView = (ImageView) itemView.findViewById(R.id.home_rec_imageView);
+                textView = itemView.findViewById(R.id.textView);
+                cardHome = itemView.findViewById(R.id.card_Home);
+                imageView = itemView.findViewById(R.id.home_rec_imageView);
 
             }
         }

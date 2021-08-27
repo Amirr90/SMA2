@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="110dp"
-    app:cardCornerRadius="5dp"
-    android:layout_margin="5dp"
-    android:layout_marginBottom="4dp"
-    android:elevation="5dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="admissionDashboardModel"
+            type="com.example.sma.model.AdmissionDashboardModel" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:layout_margin="5dp"
+        android:layout_marginBottom="4dp"
+        android:elevation="5dp"
+        app:cardCornerRadius="5dp">
 
 
         <RelativeLayout
@@ -14,21 +23,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/ripple_1"
-            android:clickable="true">
+            android:clickable="true"
+            android:focusable="true">
 
 
             <ImageView
-                android:layout_marginTop="22dp"
                 android:id="@+id/home_rec_imageView"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="22dp"
+                android:loadImage="@{admissionDashboardModel.image}"
                 app:srcCompat="@drawable/attendance" />
 
             <TextView
-                android:padding="@dimen/_10sdp"
-                android:paddingBottom="@dimen/_10sdp"
-                android:textAlignment="center"
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -36,10 +44,15 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/armata"
-                android:text="Attendance"
+                android:gravity="center_horizontal"
+                android:padding="@dimen/_10sdp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:text="@{admissionDashboardModel.title}"
+                android:textAlignment="center"
                 android:textColor="@color/dark_grey"
-                android:textSize="10dp"
-                android:gravity="center_horizontal" />
+                android:textSize="12dp"
+                android:textStyle="bold" />
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
+</layout>

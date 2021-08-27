@@ -319,18 +319,6 @@ public class AttendanceActivity extends AppCompatActivity {
             finish();
         });
 
-      /*  firestore.collection(ATTENDANCE).add(map).addOnSuccessListener(documentReference -> {
-            hideAlertDialog();
-            Intent intent = new Intent();
-            setResult(RESULT_OK, intent);
-            finish();
-        }).addOnFailureListener(e -> {
-            hideAlertDialog();
-            Intent intent = new Intent();
-            setResult(RESULT_CANCELED, intent);
-            finish();
-        });*/
-
     }
 
 

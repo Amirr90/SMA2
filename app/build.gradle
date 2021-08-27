@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.sma"
-        minSdkVersion 16
+        minSdkVersion 22
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -66,6 +66,9 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.4.2'
 
     implementation 'com.github.sundeepk:compact-calendar-view:3.0.0'
+
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
 
 
 }
