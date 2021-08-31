@@ -2,6 +2,7 @@ package com.example.sma;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -29,7 +30,6 @@ public class AddNewStudentActivity extends AppCompatActivity {
     }
 
     private void initHorizontalStepper() {
-        //adding fragment manager for ViewPager Adapter
         binding.materialStepper.setFragmentManager(getSupportFragmentManager());
 
         //adding steps
@@ -37,9 +37,8 @@ public class AddNewStudentActivity extends AppCompatActivity {
         binding.materialStepper.addStep(new BlankFragment2());
         binding.materialStepper.addStep(new BlankFragment3());
 
-        //adding functionality when NEXT button is clicked on last step
         binding.materialStepper.setOnLastStepNextListener(() -> {
-            //some action
+            Toast.makeText(this, "Adding Student !!", Toast.LENGTH_SHORT).show();
         });
     }
 

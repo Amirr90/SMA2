@@ -73,5 +73,11 @@ dependencies {
     //stepper
     implementation 'com.sonu.libraries.materialstepper:material-stepper:0.0.4'
 
+    //Images like whatsApp
+    implementation 'com.fxn769:pix:1.5.3'
+
+    //Image Picker
+    implementation 'com.github.dhaval2404:imagepicker-support:1.7.1'
+
 
 }

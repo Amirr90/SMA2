@@ -44,7 +44,6 @@ public class BlankFragment3 extends StepFragment {
     }
 
     private void customNextClick() {
-        Toast.makeText(requireActivity(), "Next Clicked !!", Toast.LENGTH_SHORT).show();
         super.onRightCLicked();
     }
 

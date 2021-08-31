@@ -22,7 +22,7 @@
         android:background="@color/colorAccent"
         android:paddingTop="20dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/t_profile_image"
             android:layout_width="70dp"
             android:layout_height="70dp"
@@ -42,7 +42,7 @@
             android:paddingTop="10dp"
             android:text="Teacher Name here"
             android:textColor="@android:color/white"
-            android:textSize="22dp" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/t_class"
@@ -76,7 +76,7 @@
         android:layout_marginRight="25dp"
         android:layout_marginBottom="25dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="4"
+        app:spanCount="3"
         tools:listitem="@layout/rv_parent_view" />
 
 
