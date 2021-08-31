@@ -10,12 +10,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-
+import com.example.sma.AddNewStudentActivity;
+import com.example.sma.App;
 import com.example.sma.R;
 import com.example.sma.SplashScreen;
+import com.example.sma.databinding.FragmentBlank1Binding;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -373,4 +375,17 @@ public class Utils {
     }
 
 
+    public static void showAlert(AddNewStudentActivity addNewStudentActivity) {
+
+    }
+
+    public static void setupDropDownMenu(FragmentBlank1Binding binding, Activity activity) {
+        String[] classList = {"Nursery", "KG", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6", "Class 7", "Class 8"};
+        ArrayAdapter adapter = new ArrayAdapter(activity, R.layout.list_item, classList);
+        binding.classTextView.setAdapter(adapter);
+
+        String[] genderList = {"Male", "Female"};
+        ArrayAdapter genderAdapter = new ArrayAdapter(App.context, R.layout.list_item, genderList);
+        binding.genderTextView.setAdapter(genderAdapter);
+    }
 }

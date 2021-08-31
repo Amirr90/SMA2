@@ -9,6 +9,14 @@
         <item name="fontFamily">@font/armata</item>
     </style>
 
+    <style name="AppTheme2" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="fontFamily">@font/armata</item>
+    </style>
+
     <style name="PopupSelectList">
         <item name="android:textSize">16.0sp</item>
         <item name="android:textColor">@color/dark_grey</item>

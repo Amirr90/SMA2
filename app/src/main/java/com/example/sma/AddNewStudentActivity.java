@@ -1,15 +1,16 @@
 package com.example.sma;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
-import com.example.sma.Util.Utils;
 import com.example.sma.databinding.ActivityAddNewStudentBinding;
-
-import java.util.Objects;
+import com.example.sma.fragments.BlankFragment1;
+import com.example.sma.fragments.BlankFragment2;
+import com.example.sma.fragments.BlankFragment3;
+import com.sonu.libraries.materialstepper.OnLastStepNextListener;
 
 public class AddNewStudentActivity extends AppCompatActivity {
 
@@ -19,14 +20,44 @@ public class AddNewStudentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_student);
-        setToolbar(binding.toolbar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initHorizontalStepper();
+    }
+
+    private void initHorizontalStepper() {
+        //adding fragment manager for ViewPager Adapter
+        binding.materialStepper.setFragmentManager(getSupportFragmentManager());
+
+        //adding steps
+        binding.materialStepper.addStep(new BlankFragment1());
+        binding.materialStepper.addStep(new BlankFragment2());
+        binding.materialStepper.addStep(new BlankFragment3());
+
+        //adding functionality when NEXT button is clicked on last step
+        binding.materialStepper.setOnLastStepNextListener(() -> {
+            //some action
+        });
     }
 
 
-    public void setToolbar(Toolbar toolbar) {
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setTitle(Utils.ADD_STUDENT);
+    @Override
+    public void onBackPressed() {
+        if (binding.materialStepper.onBackPressed() == 0) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Not Saved !!")
+                    .setMessage("All the information will lost ??")
+                    .setPositiveButton("SAVE", (dialog, id) -> {
+                        dialog.cancel();
+                    })
+                    .setNegativeButton("EXIT", (dialog, id) ->
+                            super.onBackPressed())
+                    .show();
+
+        }
+
     }
 }

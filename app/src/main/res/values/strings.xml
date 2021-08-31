@@ -40,4 +40,6 @@
     <string name="partial_paid">Partial Paid</string>
     <string name="not_paid">Not Paid</string>
     <string name="no_attendance_found">No Attendance found</string>
+    <string name="set_date">Set Date</string>
+    <string name="ok">OK</string>
 </resources>
